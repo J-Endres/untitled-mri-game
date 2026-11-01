@@ -1,0 +1,66 @@
+.log {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background: var(--paper);
+  font-size: 15px;
+  line-height: 1;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2px 6px;
+  color: var(--ink-soft);
+  border-bottom: var(--px) solid var(--tan);
+}
+
+.toolbar button {
+  font-size: 16px;
+  color: var(--cover-dark);
+}
+
+.empty {
+  margin: 0;
+  padding: 16px;
+  text-align: center;
+  color: var(--ink-soft);
+}
+
+.list {
+  flex: 1;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.list li {
+  display: flex;
+  gap: 6px;
+  padding: 2px 6px;
+  border-bottom: 1px solid var(--tan);
+}
+
+.time {
+  flex: none;
+  color: var(--ink-soft);
+}
+
+.message {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+.duration {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.error {
+  color: var(--bad);
+  background: color-mix(in srgb, var(--bad) 8%, transparent);
+}

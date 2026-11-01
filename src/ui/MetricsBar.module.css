@@ -4,6 +4,24 @@
   gap: var(--gap);
 }
 
+.column {
+  grid-template-columns: 1fr;
+  grid-auto-rows: 1fr;
+  height: 100%;
+  padding: 6px;
+  background: var(--paper);
+}
+
+.column .chip {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.column .label {
+  flex: 1;
+}
+
 /* Cream panel sprite (32×29): 1 px outline, 3 px shade at the bottom. */
 .chip {
   display: flex;

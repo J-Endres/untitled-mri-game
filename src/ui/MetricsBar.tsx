@@ -10,14 +10,16 @@ interface Props {
   constraints: Constraint[]
   /** Metrics are partial: duration and SAR are known live, SNR only after a scan. */
   metrics: Partial<Metrics>
+  /** Stacked chips filling the available height instead of a row. */
+  column?: boolean
 }
 
 /** Shows each constrained metric with its limit, coloured by pass/fail. */
-export function MetricsBar({ constraints, metrics }: Props) {
+export function MetricsBar({ constraints, metrics, column }: Props) {
   const known = { durationS: NaN, sar: NaN, snr: NaN, ...metrics }
   const { results } = evaluateConstraints(constraints, known)
   return (
-    <div className={styles.bar}>
+    <div className={`${styles.bar} ${column ? styles.column : ''}`}>
       {results.map((r) => {
         const value = known[r.metric]
         const { label, unit } = metricLabels[r.metric]

@@ -14,9 +14,21 @@ export interface ReconImage {
   pixels: Float32Array
 }
 
+/** Rows of (kx, ky, kz, t) in 1/m and s, as returned by trajex. */
+export type KSpaceRows = Float32Array | Float64Array
+
+export interface Trajectory {
+  /** One row per ADC sample. */
+  adc: KSpaceRows
+  /** One row per sequence event; NaN rows separate repetitions and state changes. */
+  full?: KSpaceRows
+}
+
 export interface SimulationResult {
   image: ReconImage
   metrics: Metrics
+  /** Missing for the offline mock. */
+  trajectory?: Trajectory
 }
 
 export interface SimulationService {

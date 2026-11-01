@@ -22,6 +22,7 @@ import {
   type Sequence,
 } from '../../domain/sequence'
 import { writePulseq } from '../../domain/pulseq'
+import { timed } from '../activityLog'
 import type { SimulationService } from '../simulation'
 import { addComplexNoise, estimateSnr, magnitudeImage } from './image'
 import { McpClient, type ToolResult } from './mcpClient'
@@ -52,12 +53,16 @@ export function createMrxSimulationService(
   const client = new McpClient(mcpUrl, authFetch)
   const phantomCache = new Map<string, Promise<{ hash: string; m0: number }>>()
 
-  const call = (name: string, args: Record<string, unknown>) => client.callTool(name, args)
+  const call = (name: string, args: Record<string, unknown>) =>
+    timed(`tool ${name}`, () => client.callTool(name, args))
 
-  async function download(url: string) {
-    const response = await authFetch(url)
-    if (!response.ok) throw new Error(`Download failed (${response.status}): ${url}`)
-    return parseNpy(await response.arrayBuffer())
+  /** `name` is only for the log. */
+  function download(url: string, name: string) {
+    return timed(`download ${name}`, async () => {
+      const response = await authFetch(url)
+      if (!response.ok) throw new Error(`Download failed (${response.status}): ${url}`)
+      return parseNpy(await response.arrayBuffer())
+    })
   }
 
   async function uploadText(fileName: string, content: string): Promise<string> {
@@ -71,9 +76,11 @@ export function createMrxSimulationService(
     }
     // Pre-signed URL: must not carry the MRX token. POST rather than PUT (as in
     // `curl -T`) because the gateway's CORS only allows GET/POST/DELETE.
-    const response = await fetch(url, { method: 'POST', body })
-    if (!response.ok) throw new Error(`Upload failed (${response.status})`)
-    return (await response.text()).trim()
+    return timed(`upload ${fileName}`, async () => {
+      const response = await fetch(url, { method: 'POST', body })
+      if (!response.ok) throw new Error(`Upload failed (${response.status})`)
+      return (await response.text()).trim()
+    })
   }
 
   async function simulateSignal(sequenceHash: string, phantomHash: string) {
@@ -82,7 +89,10 @@ export function createMrxSimulationService(
       phantom: phantomHash,
       sampler: 'fft',
     })
-    return download(link(result, (name) => name === 'signal.npy'))
+    return download(
+      link(result, (name) => name === 'signal.npy'),
+      'signal.npy',
+    )
   }
 
   /** Loads the phantom and measures its equilibrium magnetisation. */
@@ -139,11 +149,21 @@ export function createMrxSimulationService(
           t1: 1,
           t2: 0.1,
           min_mag: 1e-4,
+          full_trajectory: true,
         }),
         simulateSignal(sequenceHash, phantomHash),
       ])
       const kspaceHash = String((structured(kspaceResult).kspace as { sha256: string }).sha256)
-      const kspace = await download(link(kspaceResult, (name) => name.endsWith('-kspace.npy')))
+      const [kspace, full] = await Promise.all([
+        download(
+          link(kspaceResult, (name) => name.endsWith('-kspace.npy')),
+          'kspace.npy',
+        ),
+        download(
+          link(kspaceResult, (name) => name.endsWith('-full-trajectory.npy')),
+          'full-trajectory.npy',
+        ),
+      ])
 
       onProgress('Reconstructing…')
       const dwells = adcSampleDwellsUs(sequence.nodes)
@@ -167,8 +187,17 @@ export function createMrxSimulationService(
         fov: [RECO_FOV_M, RECO_FOV_M, RECO_FOV_M],
         resolution: matrixFor(kspace.data),
       })
-      const image = magnitudeImage(await download(link(reco, (name) => name.endsWith('.npy'))))
-      return { image, metrics: { ...metrics, snr: estimateSnr(image) } }
+      const image = magnitudeImage(
+        await download(
+          link(reco, (name) => name.endsWith('.npy')),
+          'image.npy',
+        ),
+      )
+      return {
+        image,
+        metrics: { ...metrics, snr: estimateSnr(image) },
+        trajectory: { adc: kspace.data, full: full.data },
+      }
     },
   }
 }

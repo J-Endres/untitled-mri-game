@@ -24,10 +24,14 @@ the app talks to the MRX MCP gateway directly. Leaderboard and challenges are st
   [Authentication](#authentication)); `App.tsx` uses the mock only with `VITE_MRX_MOCK=true`.
   - `mrx/` - minimal MCP client (Streamable HTTP), OAuth login, `.npy` reader/writer,
     image/SNR helpers and the simulation pipeline.
+  - `activityLog.ts` - in-memory log for the Logs tab. `timed(label, fn)` records every MRX
+    tool call, upload, download and whole scan with its duration, or the error it threw.
 - **`src/state/`** - `sequenceReducer` (UI actions -> domain operations) and `useSimulation`
   (async scan state, discards stale results).
-- **`src/ui/`** - React components. `sequence/` is the drag-and-drop editor, `sheets/` holds
-  the bottom-sheet popups. `EditorContext` provides the sequence and edit callbacks so the
+- **`src/ui/`** - React components. The top panel has tabs - Reco (`ReconView`), Stats
+  (`MetricsBar`), K-space (`KSpaceView`, trajex trajectory) and Logs (`LogView`) - with the
+  Guess and Scan buttons in its bottom corners. `sequence/` is the drag-and-drop editor,
+  `sheets/` holds the bottom-sheet popups. `EditorContext` provides the sequence and edit callbacks so the
   recursive lists and the sheets do not need prop drilling.
 
 State is plain `useReducer` + context. There is no global store library, no router and no UI
@@ -62,7 +66,8 @@ One scan (`src/services/mrx/mrxSimulation.ts`):
    gradient areas become trapezoids on a 10 µs raster with slew-limited ramps. Hardware limits
    (max amplitude) are not enforced yet.
 2. `upload_file` stores the `.seq`.
-3. In parallel: `trajex_extract_trajectory` (k-space per ADC sample) and `rapisim_simulate` on
+3. In parallel: `trajex_extract_trajectory` (k-space per ADC sample, plus the full trajectory
+   for the K-space tab) and `rapisim_simulate` on
    the challenge's phantom (`bifti_get_phantom`, resliced; `sampler: "fft"`).
 4. Noise is added in the browser (the simulation is noise-free) and the noisy signal is uploaded
    with `create_upload_url` (as `POST`: the gateway's CORS does not allow `PUT`).
