@@ -137,3 +137,6 @@ Short log of choices that are not obvious from the code. Add an entry when you m
 - **2026-11 - Own minimal MCP client instead of the SDK.** We only need `initialize` and
   `tools/call`; ~100 lines instead of a large dependency.
 - **2026-11 - No state library, no router.** One screen; `useReducer` + context suffice.
+- **2026-11 - Pixel-art UI from Crusenho's packs (CC BY 4.0).** Sprites are 9-slice
+  `border-image`s at 2× (`--px`), icons only at whole-number scales so they stay crisp. Any new
+  asset must be listed in `src/assets/CREDITS.md`; the in-game credit lives in the ⓘ sheet.

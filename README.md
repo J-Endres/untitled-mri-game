@@ -43,3 +43,10 @@ To try it on a phone in your network: `npm run dev -- --host`.
 - [docs/GAME_DESIGN.md](docs/GAME_DESIGN.md) - how the game works, open questions, roadmap
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) - code structure, data model, MRX pipeline
 - [CONTRIBUTING.md](CONTRIBUTING.md) - workflow, commits, code style
+
+## Credits
+
+UI art and icons: [Complete UI Essential Pack](https://crusenho.itch.io/complete-ui-book-styles-pack)
+and Icons Essential by [Crusenho](https://crusenho.itch.io), licensed
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Sprites were cropped and renamed; see
+[src/assets/CREDITS.md](src/assets/CREDITS.md). The credits are also shown in the game (ⓘ sheet).
