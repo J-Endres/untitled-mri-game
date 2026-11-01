@@ -4,7 +4,7 @@ import type { SimulationResult, SimulationService } from '../services/simulation
 
 export type SimulationState =
   | { status: 'idle' }
-  | { status: 'running'; previous?: SimulationResult }
+  | { status: 'running'; step: string; previous?: SimulationResult }
   | { status: 'done'; result: SimulationResult; sequence: Sequence }
   | { status: 'error'; message: string }
 
@@ -18,13 +18,19 @@ export function useSimulation(service: SimulationService, challengeId: string) {
       const id = ++runId.current
       setState((s) => ({
         status: 'running',
-        previous: s.status === 'done' ? s.result : undefined,
+        step: 'Scanning…',
+        previous: s.status === 'done' ? s.result : s.status === 'running' ? s.previous : undefined,
       }))
+      const onProgress = (step: string) =>
+        setState((s) => (id === runId.current && s.status === 'running' ? { ...s, step } : s))
       try {
-        const result = await service.simulate(sequence, challengeId)
+        const result = await service.simulate(sequence, challengeId, onProgress)
         if (id === runId.current) setState({ status: 'done', result, sequence })
       } catch (e) {
-        if (id === runId.current) setState({ status: 'error', message: String(e) })
+        if (id === runId.current) {
+          console.error(e)
+          setState({ status: 'error', message: e instanceof Error ? e.message : String(e) })
+        }
       }
     },
     [service, challengeId],

@@ -8,6 +8,8 @@ import {
 } from './domain/sequence'
 import { mockLeaderboardService } from './services/leaderboard'
 import { mockSimulationService } from './services/mockSimulation'
+import { mrxConfig } from './services/mrx/config'
+import { createMrxSimulationService } from './services/mrx/mrxSimulation'
 import { sequenceReducer } from './state/sequenceReducer'
 import { useSimulation } from './state/useSimulation'
 import styles from './App.module.css'
@@ -22,8 +24,8 @@ import { GuessSheet } from './ui/sheets/GuessSheet'
 import { LeaderboardSheet } from './ui/sheets/LeaderboardSheet'
 import { LoopSheet } from './ui/sheets/LoopSheet'
 
-// Swap these for the real implementations once the backend exists.
-const simulationService = mockSimulationService
+// Real MRX simulation when a key is configured (.env.local), offline mock otherwise.
+const simulationService = mrxConfig.apiKey ? createMrxSimulationService() : mockSimulationService
 const leaderboardService = mockLeaderboardService
 
 type Sheet =
@@ -86,7 +88,7 @@ export default function App() {
             disabled={sim.status === 'running'}
             onClick={() => run(sequence)}
           >
-            {sim.status === 'running' ? 'Scanning…' : '▶ Scan'}
+            {sim.status === 'running' ? sim.step : '▶ Scan'}
           </button>
         </footer>
 

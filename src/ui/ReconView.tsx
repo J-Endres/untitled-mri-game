@@ -40,11 +40,12 @@ export function ReconView({ state, outdated }: Props) {
       {image ? (
         <canvas ref={canvas} className={outdated ? styles.dim : undefined} />
       ) : (
-        <p className={styles.hint}>
-          {state.status === 'error' ? state.message : 'Press Scan to see what is in the scanner'}
-        </p>
+        state.status !== 'error' && (
+          <p className={styles.hint}>Press Scan to see what is in the scanner</p>
+        )
       )}
-      {state.status === 'running' && <div className={styles.badge}>Scanning…</div>}
+      {state.status === 'error' && <p className={styles.error}>{state.message}</p>}
+      {state.status === 'running' && <div className={styles.badge}>{state.step}</div>}
       {state.status === 'done' && outdated && <div className={styles.badge}>Outdated</div>}
     </div>
   )

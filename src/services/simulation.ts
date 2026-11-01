@@ -1,10 +1,8 @@
 /**
  * Boundary to the MRX simulation pipeline.
  *
- * Real pipeline (see docs/ARCHITECTURE.md): Pulseq export -> upload_file ->
- * trajex_extract_trajectory + rapisim_simulate on the hidden phantom ->
- * reco_reconstruct (nufft). It runs behind a small backend, because the
- * MCP credentials and the phantom choice must not live in the browser.
+ * Implementations: `mrx/mrxSimulation.ts` (real, MRX tools) and
+ * `mockSimulation.ts` (offline). See docs/ARCHITECTURE.md.
  */
 import type { Metrics } from '../domain/challenge'
 import type { Sequence } from '../domain/sequence'
@@ -22,5 +20,10 @@ export interface SimulationResult {
 }
 
 export interface SimulationService {
-  simulate(sequence: Sequence, challengeId: string): Promise<SimulationResult>
+  /** `onProgress` receives short status texts for the UI ("Scanning…"). */
+  simulate(
+    sequence: Sequence,
+    challengeId: string,
+    onProgress?: (status: string) => void,
+  ): Promise<SimulationResult>
 }
