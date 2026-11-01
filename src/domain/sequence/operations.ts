@@ -98,8 +98,11 @@ export function moveNode(
 ): Sequence {
   const found = findNode(seq.nodes, id)
   if (!found) return seq
-  if (targetId !== null && found.node.type === 'loop') {
-    if (targetId === id || findNode(found.node.body, targetId)) return seq
+  if (targetId !== null) {
+    if (findNode(seq.nodes, targetId)?.node.type !== 'loop') return seq
+    if (targetId === id || (found.node.type === 'loop' && findNode(found.node.body, targetId))) {
+      return seq
+    }
   }
   return insertNode(removeNode(seq, id), found.node, targetId, index)
 }

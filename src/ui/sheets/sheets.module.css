@@ -1,0 +1,143 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgb(0 0 0 / 0.5);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.sheet {
+  width: 100%;
+  max-width: 560px;
+  max-height: 85vh;
+  overflow-y: auto;
+  background: var(--surface);
+  border-radius: 16px 16px 0 0;
+  padding: 12px 16px calc(16px + env(safe-area-inset-bottom));
+  animation: slide-up 0.18s ease-out;
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(30%);
+    opacity: 0;
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.header button {
+  border: none;
+  background: none;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 14px 0;
+}
+
+.fieldLabel {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.fieldLabel output {
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.field input[type='range'] {
+  width: 100%;
+  accent-color: var(--accent);
+}
+
+.text {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px;
+}
+
+.segmented {
+  display: flex;
+  gap: 4px;
+}
+
+.segmented button {
+  flex: 1;
+  padding: 6px 4px;
+}
+
+.selected {
+  background: var(--accent) !important;
+  color: #001426;
+  border-color: var(--accent) !important;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap);
+  margin-top: 18px;
+}
+
+.palette {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--gap);
+  margin-top: 14px;
+}
+
+.palette button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 4px;
+}
+
+.plain {
+  padding-left: 18px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin-top: 10px;
+}
+
+.table th,
+.table td {
+  padding: 6px 4px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.table th {
+  color: var(--text-dim);
+  font-weight: normal;
+}
+
+.result {
+  text-align: center;
+}
+
+.big {
+  font-size: 24px;
+}

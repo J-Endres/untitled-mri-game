@@ -1,3 +1,5 @@
+import { challenges, score, type Metrics } from '../domain/challenge'
+
 export interface LeaderboardEntry {
   player: string
   score: number
@@ -8,6 +10,8 @@ export interface LeaderboardEntry {
 
 export interface LeaderboardService {
   top(challengeId: string): Promise<LeaderboardEntry[]>
+  /** The answer is checked server-side so the client never knows the phantom. */
+  submit(challengeId: string, answer: string, metrics: Metrics): Promise<AnswerResult>
 }
 
 /** MOCK: static entries until there is a backend. */
@@ -20,4 +24,14 @@ export const mockLeaderboardService: LeaderboardService = {
       { player: 'gradient_echo', score: 401, durationS: 1.49, sar: 1.9, snr: 11.3 },
     ]
   },
+  async submit(challengeId, answer, metrics) {
+    const challenge = challenges.find((c) => c.id === challengeId)
+    const correct = answer === 'Brain' // the mock simulation always shows a brain
+    return { correct, score: challenge ? score(challenge.constraints, metrics, correct) : 0 }
+  },
+}
+
+export interface AnswerResult {
+  correct: boolean
+  score: number
 }

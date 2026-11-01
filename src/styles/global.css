@@ -1,0 +1,75 @@
+:root {
+  --bg: #0e1116;
+  --surface: #171b22;
+  --surface-2: #20262f;
+  --border: #2c333e;
+  --text: #e6e9ee;
+  --text-dim: #8b95a5;
+  --accent: #4fb3ff;
+  --ok: #3ecf8e;
+  --bad: #ff6b6b;
+
+  --c-rf: #ff7a59;
+  --c-adc: #3ecf8e;
+  --c-gradient: #4fb3ff;
+  --c-spoiler: #b48cff;
+  --c-delay: #8b95a5;
+  --c-loop: #f5c542;
+
+  --radius: 10px;
+  --gap: 8px;
+
+  color-scheme: dark;
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  font-size: 15px;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-tap-highlight-color: transparent;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  height: 100%;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+button.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #001426;
+  font-weight: 600;
+}
+
+button.danger {
+  color: var(--bad);
+}
+
+input {
+  font: inherit;
+  color: inherit;
+}

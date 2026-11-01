@@ -1,0 +1,38 @@
+.bar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--gap);
+}
+
+.chip {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 8px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left-width: 4px;
+}
+
+.label,
+.limit {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.value {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.ok {
+  border-left-color: var(--ok);
+}
+
+.bad {
+  border-left-color: var(--bad);
+}
+
+.unknown {
+  border-left-color: var(--border);
+}
