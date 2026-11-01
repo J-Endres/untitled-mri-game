@@ -1,5 +1,5 @@
 /**
- * MOCK simulation: renders a procedural "phantom" at a resolution derived from
+ * MOCK: simulation that renders a procedural "phantom" at a resolution derived from
  * the sequence and adds noise according to a made-up SNR model. Duration and
  * SAR are computed from the sequence like the real service will do.
  */

@@ -15,7 +15,7 @@ export function evaluateConstraints(constraints: Constraint[], metrics: Metrics)
 }
 
 /**
- * MOCK scoring: a correct answer with all constraints satisfied scores higher
+ * MOCK: scoring - a correct answer with all constraints satisfied scores higher
  * the shorter the scan. The real formula is an open game-design question.
  */
 export function score(constraints: Constraint[], metrics: Metrics, answerCorrect: boolean): number {
