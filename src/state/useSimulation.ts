@@ -1,5 +1,6 @@
 import { useCallback, useRef, useState } from 'react'
 import type { Sequence } from '../domain/sequence'
+import { errorMessage, timed } from '../services/activityLog'
 import type { SimulationResult, SimulationService } from '../services/simulation'
 
 export type SimulationState =
@@ -24,12 +25,14 @@ export function useSimulation(service: SimulationService, challengeId: string) {
       const onProgress = (step: string) =>
         setState((s) => (id === runId.current && s.status === 'running' ? { ...s, step } : s))
       try {
-        const result = await service.simulate(sequence, challengeId, onProgress)
+        const result = await timed('scan', () =>
+          service.simulate(sequence, challengeId, onProgress),
+        )
         if (id === runId.current) setState({ status: 'done', result, sequence })
       } catch (e) {
         if (id === runId.current) {
           console.error(e)
-          setState({ status: 'error', message: e instanceof Error ? e.message : String(e) })
+          setState({ status: 'error', message: errorMessage(e) })
         }
       }
     },

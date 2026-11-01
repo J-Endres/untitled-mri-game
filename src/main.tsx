@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App'
+import { activityLog, errorMessage } from './services/activityLog'
 import { mrx } from './services/mrx/config'
 import './styles/global.css'
 
@@ -9,9 +10,11 @@ async function finishLogin() {
   if (mrx.mode !== 'oauth') return
   try {
     if (!(await mrx.auth.handleRedirect(window.location.href))) return
+    activityLog.info('MRX login completed')
   } catch (e) {
     console.error(e)
-    window.alert(e instanceof Error ? e.message : String(e))
+    activityLog.error(errorMessage(e))
+    window.alert(errorMessage(e))
   }
   window.history.replaceState(null, '', window.location.pathname)
 }
