@@ -51,7 +51,7 @@ else 0. Ideas: bonus for fewer blocks, for SAR headroom, for higher resolution.
 
 ## Open questions
 
-- How is SNR defined and measured, and how much noise is added to the noise-free simulation?
+- Noise level: `NOISE_REL` needs calibrating so that SNR limits feel right (see ARCHITECTURE).
 - Should the answer be multiple choice or free text / tapping a region in the image?
 - Which phantoms make good challenges (BrainWeb slices, breast, geometric shapes, ...),
   and how is the difficulty ramped?
@@ -62,8 +62,10 @@ else 0. Ideas: bonus for fewer blocks, for SAR headroom, for higher resolution.
 
 ## Roadmap
 
-1. ~~Repo setup, UI mockup with mock services~~ (this state)
-2. Pulseq export with tests (loop unrolling, gradient shapes, raster times)
-3. Backend: MRX pipeline (export -> trajex -> rapisim -> nufft reco), real SNR
-4. Challenges from the backend, answer checking, real leaderboard
-5. Polish: onboarding/tutorial challenge, sequence templates, undo, PWA install
+1. ~~Repo setup, UI mockup with mock services~~
+2. ~~Pulseq export with tests~~
+3. ~~MRX pipeline from the browser (export -> trajex -> rapisim -> nufft reco), SNR~~ (this
+   state, with a temporary API key)
+4. OAuth login with MRX (user id for submissions), remove the test key
+5. Challenges and answer checking that the player cannot inspect, real leaderboard
+6. Polish: hardware limits, onboarding/tutorial challenge, sequence templates, undo, PWA install

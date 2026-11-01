@@ -1,14 +1,14 @@
 # Architecture
 
-A static single-page app (Vite + React + TypeScript) that talks to a small backend for
-simulation and the leaderboard. Today the backend is mocked inside the client.
+A static single-page app (Vite + React + TypeScript). For now everything runs in the browser:
+the app talks to the MRX MCP gateway directly. Leaderboard and challenges are still mocked.
 
 ```
-┌─────────────────────────── browser ───────────────────────────┐      ┌──────── backend (planned) ───────┐
-│ ui/  ──▶ state/ ──▶ domain/ (model, operations, metrics)       │      │ picks hidden phantom per challenge│
-│              └────▶ services/ SimulationService ───────────────┼─────▶│ runs MRX tools, checks answers,   │
-│                               LeaderboardService               │ HTTP │ stores leaderboard                │
-└────────────────────────────────────────────────────────────────┘      └───────────────────────────────────┘
+┌──────────────────────────── browser ────────────────────────────┐
+│ ui/ ──▶ state/ ──▶ domain/ (model, operations, metrics, pulseq)  │       ┌── MRX MCP gateway ──┐
+│             └────▶ services/ SimulationService (mrx/) ───────────┼──────▶│ bifti, rapisim,     │
+│                              LeaderboardService (mock)           │ HTTPS │ trajex, reco, files │
+└──────────────────────────────────────────────────────────────────┘       └─────────────────────┘
 ```
 
 ## Layers
@@ -18,8 +18,12 @@ simulation and the leaderboard. Today the backend is mocked inside the client.
     (insert, move, link/unlink, wrap/unwrap), metrics (duration, heuristic SAR) and
     validation (which events may play together).
   - `challenge/` - challenge definitions, constraints and scoring.
+  - `pulseq/` - Pulseq 1.4 writer (loop unrolling, trapezoids, RF/ADC/shape libraries).
 - **`src/services/`** - interfaces for everything that crosses the network, plus `mock*`
-  implementations. `App.tsx` decides which implementation is used.
+  implementations. `App.tsx` decides which implementation is used: MRX if
+  `VITE_MRX_API_KEY` is set, the offline mock otherwise.
+  - `mrx/` - minimal MCP client (Streamable HTTP), `.npy` reader/writer, image/SNR helpers and
+    the simulation pipeline.
 - **`src/state/`** - `sequenceReducer` (UI actions -> domain operations) and `useSimulation`
   (async scan state, discards stale results).
 - **`src/ui/`** - React components. `sequence/` is the drag-and-drop editor, `sheets/` holds
@@ -52,34 +56,40 @@ SeqEvent = RfEvent | AdcEvent | GradientEvent | SpoilerEvent | DelayEvent
 
 ## Simulation pipeline (MRX)
 
-Planned flow for one scan; all steps after the export run in the backend, because the MCP
-credentials and the choice of phantom must not be visible to the player:
+One scan (`src/services/mrx/mrxSimulation.ts`):
 
-1. **Export** (client or backend): unroll loops, convert areas/durations to gradient shapes on
-   the scanner raster, write a Pulseq `.seq` file.
-2. `upload_file` - store the `.seq`, get its hash.
-3. `trajex_extract_trajectory` - k-space trajectory of the sequence (per ADC sample).
-4. `rapisim_simulate` - simulate the sequence on the hidden bifti phantom (e.g. a BrainWeb
-   slice from `endres-brainweb-001`, a breast phantom from `duarte-breast-001`, or geometric
-   shapes from `endres-bifti_demo-001`). `sampler: "fft"` keeps it fast.
-5. `reco_reconstruct` with `method: "nufft"` - reconstruct the image from signal + trajectory.
-6. Return a downsampled magnitude image (`ReconImage`) and the metrics to the client.
+1. `writePulseq` (domain) turns the sequence into a Pulseq 1.4 file. Loops are unrolled,
+   gradient areas become trapezoids on a 10 µs raster with slew-limited ramps. Hardware limits
+   (max amplitude) are not enforced yet.
+2. `upload_file` stores the `.seq`.
+3. In parallel: `trajex_extract_trajectory` (k-space per ADC sample) and `rapisim_simulate` on
+   the challenge's phantom (`bifti_get_phantom`, resliced; `sampler: "fft"`).
+4. Noise is added in the browser (the simulation is noise-free) and the noisy signal is uploaded
+   with `create_upload_url`.
+5. `reco_reconstruct` with `method: "nufft"`. FOV is fixed at 200 mm; the matrix is the smallest
+   one whose Nyquist limit covers the sampled k-space (the tool rejects anything else).
+6. The magnitude image is normalised and shown; SNR is measured on it.
 
 Metrics:
 
 - **Duration** is exact from the sequence (`domain/sequence/metrics.ts`).
-- **SAR** is currently a heuristic based on B1² of hard pulses. Rapisim does not report SAR,
-  so a better estimate has to be computed from the RF shapes (backend, same code as client).
-- **SNR**: the simulation is noise-free, so noise must be added in the backend (scaled with
-  bandwidth / number of samples) and SNR measured on the image. Open question, see
-  [GAME_DESIGN.md](GAME_DESIGN.md#open-questions).
+- **SAR** is a heuristic based on B1² of the RF pulses. Rapisim does not report SAR.
+- **SNR**: complex Gaussian noise per sample, `sigma = NOISE_REL · M0 · sqrt(20 µs / dwell)`.
+  `M0` is the phantom's total equilibrium magnetisation, measured once per phantom with a
+  reference scan (90° pulse + one sample at k = 0), so the noise level does not depend on the
+  simulator's signal scale. SNR = mean object magnitude / noise sigma, with object and
+  background separated by Otsu's threshold and sigma from the Rayleigh-distributed background.
+  Artefacts in the background therefore lower the SNR too. `NOISE_REL` is a first estimate and
+  needs calibrating against real runs.
 
-Values that count for the leaderboard are always recomputed by the backend.
+Known limitations of running in the browser (to be fixed together with OAuth / a backend):
+the API key and the phantom choice are visible to the player, every scan leaves files in the
+user's MRX storage, and it relies on the gateway allowing cross-origin requests.
 
 ## Testing
 
-- Vitest unit tests for everything in `domain/` (and later the Pulseq writer - compare against
-  reference `.seq` files).
+- Vitest unit tests for everything in `domain/` (including the Pulseq writer) and the pure
+  helpers in `services/mrx/`.
 - UI is checked manually in a phone viewport for now; add Playwright tests once the UI
   settles.
 
@@ -91,6 +101,9 @@ Short log of choices that are not obvious from the code. Add an entry when you m
   (`@dnd-kit`). Canvas is enough for the image; no game engine needed for a list-based UI.
 - **2026-11 - Model = Pulseq blocks + loops.** Keeps export trivial and makes "linking" a
   direct operation on blocks.
-- **2026-11 - Backend proxy for MRX.** Hides the phantom (otherwise the game is trivially
-  cheatable) and the MCP credentials.
+- **2026-11 - MRX called from the browser for now.** Fastest way to a playable prototype. Uses a
+  test API key that must be removed before release; later OAuth (which also identifies users for
+  leaderboard submissions). A backend may still be needed to hide the phantom from players.
+- **2026-11 - Own minimal MCP client instead of the SDK.** We only need `initialize` and
+  `tools/call`; ~100 lines instead of a large dependency.
 - **2026-11 - No state library, no router.** One screen; `useReducer` + context suffice.
