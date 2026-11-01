@@ -48,5 +48,6 @@ To try it on a phone in your network: `npm run dev -- --host`.
 
 UI art and icons: [Complete UI Essential Pack](https://crusenho.itch.io/complete-ui-book-styles-pack)
 and Icons Essential by [Crusenho](https://crusenho.itch.io), licensed
-[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Sprites were cropped and renamed; see
-[src/assets/CREDITS.md](src/assets/CREDITS.md). The credits are also shown in the game (ⓘ sheet).
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Sprites were recoloured, cropped and
+renamed. Fonts: VT323 and Silkscreen (SIL Open Font License). See
+[src/assets/CREDITS.md](src/assets/CREDITS.md); the credits are also shown in the game (ⓘ sheet).
