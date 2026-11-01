@@ -1,16 +1,22 @@
 name: CI
 
+# Checks every push and pull request; pushes to main are also published to
+# GitHub Pages (Settings -> Pages -> Source: GitHub Actions).
 on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
           cache: npm
@@ -19,4 +25,33 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm test
+      # No VITE_MRX_API_KEY here: the published game makes players log in with MRX (OAuth).
       - run: npm run build
+      - name: Make sure no MRX API key ended up in the bundle
+        run: |
+          if grep -rlE 'mrx_[A-Za-z0-9_-]{20,}' dist; then
+            echo "::error::An MRX API key is compiled into the build. Remove VITE_MRX_API_KEY."
+            exit 1
+          fi
+      - uses: actions/upload-pages-artifact@v5
+        if: github.event_name != 'pull_request'
+        with:
+          path: dist
+
+  deploy:
+    needs: check
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    # Never cancel a running deployment, but skip outdated queued ones.
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
