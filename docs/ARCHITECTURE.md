@@ -86,6 +86,22 @@ Known limitations of running in the browser (to be fixed together with OAuth / a
 the API key and the phantom choice are visible to the player, every scan leaves files in the
 user's MRX storage, and it relies on the gateway allowing cross-origin requests.
 
+### Not yet verified against the real gateway
+
+The browser client was only tested against a fake server in Playwright (the development
+container had no network access to MRX). The Pulseq export itself _was_ verified with the MRX
+tools (trajex + rapisim + nufft reco give a recognisable head). Still to check with a real
+`npm run dev` scan:
+
+- [ ] Endpoint is `https://mrx-org--mcp-gateway-func.modal.run/mcp` (override: `VITE_MRX_URL`)
+- [ ] The API key is accepted as `Authorization: Bearer <key>`
+- [ ] CORS allows the MCP calls, `GET /files/<hash>` downloads (with the auth header) and the
+      `PUT` to the `create_upload_url` URL; the upload response body is the sha256
+- [ ] Result shapes match what `mrxSimulation.ts` expects (`upload_file` -> `result` hash,
+      trajex `structuredContent.kspace.sha256`, resource links named `signal.npy`, `*.zip`,
+      `*-kspace.npy`, `*.npy`)
+- [ ] Calibrate `NOISE_REL` so the starter sequence lands near SNR 10
+
 ## Testing
 
 - Vitest unit tests for everything in `domain/` (including the Pulseq writer) and the pure
