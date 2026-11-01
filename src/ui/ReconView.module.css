@@ -1,3 +1,4 @@
+/* Grey bevelled frame sprite (96×64, 4 px bevel) around the image. */
 .view {
   position: relative;
   aspect-ratio: 1;
@@ -5,7 +6,10 @@
   width: min(100%, 34dvh);
   margin: 0 auto;
   background: #000;
-  border-radius: var(--radius);
+  border-style: solid;
+  border-width: calc(4 * var(--px));
+  border-image: url('../assets/ui/frame-grey.png') 4 / calc(4 * var(--px));
+  image-rendering: pixelated;
   overflow: hidden;
   display: grid;
   place-items: center;
@@ -30,22 +34,23 @@
 
 .badge {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 6px;
+  right: 6px;
   padding: 2px 8px;
-  border-radius: 999px;
   font-size: 12px;
-  background: rgb(0 0 0 / 0.7);
-  border: 1px solid var(--border);
+  font-weight: 600;
+  color: var(--text-on-panel);
+  background: var(--cream);
+  border: var(--px) solid var(--ink);
 }
 
 .error {
   position: absolute;
-  inset: auto 8px 8px;
+  inset: auto 6px 6px;
   margin: 0;
   padding: 8px;
   font-size: 13px;
-  color: var(--bad);
-  background: rgb(0 0 0 / 0.8);
-  border-radius: var(--radius);
+  color: var(--cream);
+  background: #8a0003;
+  border: var(--px) solid var(--ink);
 }

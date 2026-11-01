@@ -1,6 +1,7 @@
 import { findEvent, findNode, type SeqEvent } from '../../domain/sequence'
 import { kindInfo } from '../eventInfo'
 import { useEditor } from '../sequence/EditorContext'
+import { Icon } from '../icons'
 import { BottomSheet } from './BottomSheet'
 import { SegmentedField, SliderField } from './fields'
 import styles from './sheets.module.css'
@@ -164,7 +165,7 @@ export function EventSheet({ eventId, onClose }: { eventId: string; onClose: () 
             onClose()
           }}
         >
-          Delete
+          <Icon name="trashbin" /> Delete
         </button>
       </div>
     </BottomSheet>

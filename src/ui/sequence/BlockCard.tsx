@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import type { Block } from '../../domain/sequence'
 import { eventDetail, eventTitle, kindInfo } from '../eventInfo'
 import { useEditor } from './EditorContext'
@@ -25,12 +26,10 @@ export function BlockCard({ block }: { block: Block }) {
           <button
             key={e.id}
             className={styles.event}
-            style={{ borderLeftColor: kindInfo[e.kind].color }}
+            style={{ '--kind': kindInfo[e.kind].color } as CSSProperties}
             onClick={() => editEvent(e.id)}
           >
-            <span className={styles.icon} style={{ color: kindInfo[e.kind].color }}>
-              {kindInfo[e.kind].icon}
-            </span>
+            <span className={styles.icon}>{kindInfo[e.kind].icon}</span>
             <span className={styles.text}>
               <span className={styles.title}>{eventTitle(e)}</span>
               <span className={styles.detail}>{eventDetail(e)}</span>

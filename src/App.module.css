@@ -14,17 +14,22 @@
 }
 
 .header button {
-  background: none;
-  border: none;
-  font-weight: 600;
+  color: var(--text);
+  font-size: 17px;
+}
+
+.headerActions {
+  display: flex;
+  gap: 4px;
 }
 
 .top {
   display: flex;
   flex-direction: column;
   gap: var(--gap);
-  padding: 0 12px 8px;
-  border-bottom: 1px solid var(--border);
+  padding: 0 12px 10px;
+  border-bottom: var(--px) solid var(--ink);
+  box-shadow: 0 var(--px) 0 var(--border);
 }
 
 .editor {
@@ -37,11 +42,7 @@
   display: grid;
   grid-template-columns: 1fr 2fr;
   gap: var(--gap);
-  padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
-  border-top: 1px solid var(--border);
+  padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+  border-top: var(--px) solid var(--ink);
   background: var(--surface);
-}
-
-.footer button {
-  padding: 12px;
 }

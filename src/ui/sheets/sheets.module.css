@@ -8,14 +8,19 @@
   justify-content: center;
 }
 
+/* Cream paper sprite (64×32): 1 px outline, 3 px shade at the bottom. */
 .sheet {
   width: 100%;
   max-width: 560px;
   max-height: 85vh;
   overflow-y: auto;
-  background: var(--surface);
-  border-radius: 16px 16px 0 0;
-  padding: 12px 16px calc(16px + env(safe-area-inset-bottom));
+  color: var(--text-on-panel);
+  border-style: solid;
+  border-width: 0;
+  border-image: url('../../assets/ui/input.png') 2 2 5 2 fill / calc(2 * var(--px))
+    calc(2 * var(--px)) calc(5 * var(--px));
+  image-rendering: pixelated;
+  padding: 12px 16px calc(16px + 5 * var(--px) + env(safe-area-inset-bottom));
   animation: slide-up 0.18s ease-out;
 }
 
@@ -38,8 +43,7 @@
 }
 
 .header button {
-  border: none;
-  background: none;
+  font-size: 18px;
 }
 
 .field {
@@ -53,23 +57,22 @@
   display: flex;
   justify-content: space-between;
   font-size: 13px;
-  color: var(--text-dim);
+  color: var(--text-on-panel-dim);
 }
 
 .fieldLabel output {
-  color: var(--text);
+  color: var(--text-on-panel);
   font-variant-numeric: tabular-nums;
 }
 
 .field input[type='range'] {
   width: 100%;
-  accent-color: var(--accent);
 }
 
 .text {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  color: var(--text-on-panel);
+  background: var(--cream);
+  border: var(--px) solid var(--ink);
   padding: 8px;
 }
 
@@ -80,13 +83,17 @@
 
 .segmented button {
   flex: 1;
-  padding: 6px 4px;
+  padding-left: 4px;
+  padding-right: 4px;
 }
 
-.selected {
-  background: var(--accent) !important;
-  color: #001426;
-  border-color: var(--accent) !important;
+/* Blue frame sprite, as for primary buttons. */
+.segmented button.selected,
+.segmented button.selected:active {
+  color: var(--cream);
+  border-image: url('../../assets/ui/frame-blue.png') 4 fill / calc(4 * var(--px));
+  padding: calc(5 * var(--px)) 4px;
+  text-shadow: var(--px) var(--px) 0 #1b4ab9;
 }
 
 .actions {
@@ -104,11 +111,10 @@
 }
 
 .palette button {
-  display: flex;
   flex-direction: column;
-  align-items: center;
   gap: 4px;
-  padding: 14px 4px;
+  padding-left: 4px;
+  padding-right: 4px;
 }
 
 .plain {
@@ -126,11 +132,11 @@
 .table td {
   padding: 6px 4px;
   text-align: left;
-  border-bottom: 1px solid var(--border);
+  border-bottom: var(--px) solid var(--cream-shade);
 }
 
 .table th {
-  color: var(--text-dim);
+  color: var(--text-on-panel-dim);
   font-weight: normal;
 }
 
@@ -140,4 +146,14 @@
 
 .big {
   font-size: 24px;
+}
+
+.credits {
+  margin-top: 24px;
+  font-size: 11px;
+  color: var(--text-on-panel-dim);
+}
+
+.credits a {
+  color: inherit;
 }

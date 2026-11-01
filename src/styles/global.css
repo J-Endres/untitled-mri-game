@@ -1,22 +1,40 @@
+/*
+ * Pixel-art theme built from Crusenho's "Complete UI Essential Pack" and
+ * "Icons Essential" (CC BY 4.0, see src/assets/CREDITS.md). Sprites are drawn
+ * as 9-slice border images at --px scale.
+ */
 :root {
-  --bg: #0e1116;
-  --surface: #171b22;
-  --surface-2: #20262f;
-  --border: #2c333e;
-  --text: #e6e9ee;
-  --text-dim: #8b95a5;
-  --accent: #4fb3ff;
-  --ok: #3ecf8e;
-  --bad: #ff6b6b;
+  /* Pack palette */
+  --ink: #000;
+  --cream: #fffdf5;
+  --cream-shade: #ffc579;
+  --grey: #adb7c4;
+  --grey-dark: #808ba1;
+  --blue: #267ae9;
+  --orange: #ffa61f;
 
-  --c-rf: #ff7a59;
-  --c-adc: #3ecf8e;
-  --c-gradient: #4fb3ff;
-  --c-spoiler: #b48cff;
-  --c-delay: #8b95a5;
-  --c-loop: #f5c542;
+  --bg: #262a3b;
+  --surface: #31364a;
+  --border: #4a5068;
+  --text: var(--cream);
+  --text-dim: var(--grey);
+  /* Text on cream panels */
+  --text-on-panel: #262626;
+  --text-on-panel-dim: var(--grey-dark);
+  --accent: var(--blue);
+  --ok: #14c814;
+  --bad: #ee0004;
 
-  --radius: 10px;
+  --c-rf: #ee3b2b;
+  --c-adc: #14a314;
+  --c-gradient: var(--blue);
+  --c-spoiler: #8a4fd8;
+  --c-delay: var(--grey-dark);
+  --c-loop: var(--orange);
+
+  /* One sprite pixel on screen */
+  --px: 2px;
+  --radius: 0;
   --gap: 8px;
 
   color-scheme: dark;
@@ -43,33 +61,83 @@ body,
   height: 100%;
 }
 
+/* Cream button: 32×32 sprite, slices 9/5/9/5. The pressed sprite has a lower
+   top edge and a thinner shade, so the label moves down by 3 sprite pixels. */
 button {
   font: inherit;
-  color: inherit;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 8px 12px;
+  font-weight: 600;
+  color: var(--text-on-panel);
+  background: none;
+  border-style: solid;
+  border-width: 0;
+  border-image: url('../assets/ui/button.png') 9 5 9 5 fill / calc(9 * var(--px))
+    calc(5 * var(--px));
+  image-rendering: pixelated;
+  padding: calc(5 * var(--px)) calc(6 * var(--px)) calc(8 * var(--px));
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+button:active:not(:disabled) {
+  border-image-source: url('../assets/ui/button-pressed.png');
+  padding-top: calc(8 * var(--px));
+  padding-bottom: calc(5 * var(--px));
 }
 
 button:disabled {
-  opacity: 0.4;
+  opacity: 0.5;
   cursor: default;
 }
 
-button.primary {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #001426;
-  font-weight: 600;
+/* Blue frame: 96×64 sprite with a 4 px bevel. */
+button.primary,
+button.selected {
+  color: var(--cream);
+  border-image: url('../assets/ui/frame-blue.png') 4 fill / calc(4 * var(--px));
+  padding: calc(5 * var(--px)) calc(6 * var(--px));
+  text-shadow: var(--px) var(--px) 0 #1b4ab9;
+}
+
+button.primary:active:not(:disabled),
+button.selected:active:not(:disabled) {
+  border-image-source: url('../assets/ui/frame-blue.png');
+  padding: calc(5 * var(--px)) calc(6 * var(--px));
+  transform: translateY(var(--px));
+  filter: brightness(0.9);
 }
 
 button.danger {
   color: var(--bad);
 }
 
+/* Borderless button, e.g. icons in headers. */
+button.plain {
+  border-image: none;
+  padding: 4px;
+}
+
+button.plain:active:not(:disabled) {
+  border-image: none;
+  padding: 4px;
+  transform: translateY(var(--px));
+}
+
 input {
   font: inherit;
   color: inherit;
+}
+
+input[type='range'] {
+  accent-color: var(--orange);
+}
+
+/* Pixel icons from Icons Essential (16×16), only at whole-number scales. */
+.icon {
+  width: calc(16 * var(--px));
+  height: calc(16 * var(--px));
+  image-rendering: pixelated;
+  flex: none;
 }

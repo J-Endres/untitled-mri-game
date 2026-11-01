@@ -1,6 +1,7 @@
 import { findNode } from '../../domain/sequence'
 import { kindInfo } from '../eventInfo'
 import { useEditor } from '../sequence/EditorContext'
+import { Icon } from '../icons'
 import { BottomSheet } from './BottomSheet'
 import { SliderField } from './fields'
 import styles from './sheets.module.css'
@@ -37,7 +38,7 @@ export function LoopSheet({ loopId, onClose }: { loopId: string; onClose: () => 
       <div className={styles.actions}>
         <button onClick={() => close({ type: 'unwrap', id: loopId })}>Unwrap</button>
         <button className="danger" onClick={() => close({ type: 'removeNode', id: loopId })}>
-          Delete with content
+          <Icon name="trashbin" /> Delete with content
         </button>
       </div>
     </BottomSheet>

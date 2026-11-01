@@ -4,35 +4,50 @@
   gap: var(--gap);
 }
 
+/* Cream panel sprite (32×29): 1 px outline, 3 px shade at the bottom. */
 .chip {
   display: flex;
   flex-direction: column;
-  padding: 4px 8px;
-  border-radius: var(--radius);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-left-width: 4px;
+  padding: 4px 8px calc(5 * var(--px) + 2px);
+  color: var(--text-on-panel);
+  border-style: solid;
+  border-width: 0;
+  border-image: url('../assets/ui/panel.png') 2 2 5 2 fill / calc(2 * var(--px)) calc(2 * var(--px))
+    calc(5 * var(--px));
+  image-rendering: pixelated;
 }
 
 .label,
 .limit {
   font-size: 11px;
-  color: var(--text-dim);
+  color: var(--text-on-panel-dim);
+}
+
+/* Status light in front of the label. */
+.label::before {
+  content: '';
+  display: inline-block;
+  width: calc(3 * var(--px));
+  height: calc(3 * var(--px));
+  margin-right: 5px;
+  vertical-align: 1px;
+  border: var(--px) solid var(--ink);
+  background: var(--status);
 }
 
 .value {
-  font-weight: 600;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
 
 .ok {
-  border-left-color: var(--ok);
+  --status: var(--ok);
 }
 
 .bad {
-  border-left-color: var(--bad);
+  --status: var(--bad);
 }
 
 .unknown {
-  border-left-color: var(--border);
+  --status: var(--grey);
 }

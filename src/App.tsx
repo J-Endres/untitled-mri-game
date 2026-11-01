@@ -15,6 +15,7 @@ import { sequenceReducer } from './state/sequenceReducer'
 import { useSimulation } from './state/useSimulation'
 import styles from './App.module.css'
 import { MetricsBar } from './ui/MetricsBar'
+import { Icon } from './ui/icons'
 import { ReconView } from './ui/ReconView'
 import { EditorContext, type EditorContextValue } from './ui/sequence/EditorContext'
 import { SequenceEditor } from './ui/sequence/SequenceEditor'
@@ -91,18 +92,26 @@ export default function App() {
     <EditorContext value={editor}>
       <div className={styles.app}>
         <header className={styles.header}>
-          <button onClick={() => setSheet({ kind: 'challenge' })}>ⓘ {challenge.title}</button>
-          <div>
+          <button className="plain" onClick={() => setSheet({ kind: 'challenge' })}>
+            <Icon name="info" /> {challenge.title}
+          </button>
+          <div className={styles.headerActions}>
             {mrx.mode === 'oauth' &&
               (loggedIn ? (
-                <button onClick={logout}>Log out</button>
+                <button className="plain" onClick={logout} aria-label="Log out">
+                  <Icon name="exit" />
+                </button>
               ) : (
-                <button onClick={login} disabled={loggingIn}>
-                  Log in
+                <button className="plain" onClick={login} disabled={loggingIn} aria-label="Log in">
+                  <Icon name="enter" />
                 </button>
               ))}
-            <button onClick={() => setSheet({ kind: 'leaderboard' })} aria-label="Leaderboard">
-              🏆
+            <button
+              className="plain"
+              onClick={() => setSheet({ kind: 'leaderboard' })}
+              aria-label="Leaderboard"
+            >
+              <Icon name="trophy" />
             </button>
           </div>
         </header>
@@ -121,7 +130,7 @@ export default function App() {
             disabled={sim.status !== 'done' || outdated}
             onClick={() => setSheet({ kind: 'guess' })}
           >
-            Guess
+            <Icon name="search" /> Guess
           </button>
           {loggedIn ? (
             <button
@@ -129,11 +138,23 @@ export default function App() {
               disabled={sim.status === 'running'}
               onClick={() => run(sequence)}
             >
-              {sim.status === 'running' ? sim.step : '▶ Scan'}
+              {sim.status === 'running' ? (
+                sim.step
+              ) : (
+                <>
+                  <Icon name="play" /> Scan
+                </>
+              )}
             </button>
           ) : (
             <button className="primary" disabled={loggingIn} onClick={login}>
-              {loggingIn ? 'Opening MRX login…' : 'Log in with MRX to scan'}
+              {loggingIn ? (
+                'Opening MRX login…'
+              ) : (
+                <>
+                  <Icon name="enter" /> Log in with MRX to scan
+                </>
+              )}
             </button>
           )}
         </footer>

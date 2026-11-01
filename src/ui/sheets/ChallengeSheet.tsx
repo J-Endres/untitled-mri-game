@@ -21,6 +21,14 @@ export function ChallengeSheet({
           </li>
         ))}
       </ul>
+      <p className={styles.credits}>
+        UI art and icons:{' '}
+        <a href="https://crusenho.itch.io/complete-ui-book-styles-pack">
+          Complete UI Essential Pack
+        </a>{' '}
+        and <a href="https://crusenho.itch.io">Icons Essential</a> by Crusenho, licensed{' '}
+        <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> (cropped).
+      </p>
     </BottomSheet>
   )
 }
