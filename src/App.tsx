@@ -122,6 +122,7 @@ export default function App() {
         </section>
 
         <main className={styles.editor}>
+          <h2 className="section-bar">Sequence</h2>
           <SequenceEditor />
         </main>
 

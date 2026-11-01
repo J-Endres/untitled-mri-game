@@ -1,52 +1,65 @@
 /*
- * Pixel-art theme built from Crusenho's "Complete UI Essential Pack" and
- * "Icons Essential" (CC BY 4.0, see src/assets/CREDITS.md). Sprites are drawn
- * as 9-slice border images at --px scale.
+ * Pixel-art "journal" theme. Sprites come from Crusenho's "Complete UI
+ * Essential Pack" and "Icons Essential" (CC BY 4.0), recoloured to the warm
+ * palette of the pack's book style; fonts VT323 and Silkscreen (OFL). See
+ * src/assets/CREDITS.md. Sprites are drawn as 9-slice border images at --px.
  */
+/* Body: VT323 (clear digits); headings: Silkscreen. Both OFL. */
+@font-face {
+  font-family: 'VT323';
+  src: url('../assets/fonts/VT323.ttf') format('truetype');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Silkscreen';
+  src: url('../assets/fonts/Silkscreen.ttf') format('truetype');
+  font-display: swap;
+}
+
 :root {
-  /* Pack palette */
-  --ink: #000;
-  --cream: #fffdf5;
-  --cream-shade: #ffc579;
-  --grey: #adb7c4;
-  --grey-dark: #808ba1;
-  --blue: #267ae9;
+  /* Palette of the book style */
+  --ink: #3f2832;
+  --ink-soft: #9a7660;
+  --paper: #fae5bb;
+  --page: #ffd7a8;
+  --tan: #e5b67f;
+  --tan-dark: #c4915f;
+  --cover: #b65a5e;
+  --cover-dark: #8e4048;
   --orange: #ffa61f;
+  --plum: #5d3e49;
+  --plum-light: #845b58;
 
-  --bg: #262a3b;
-  --surface: #31364a;
-  --border: #4a5068;
-  --text: var(--cream);
-  --text-dim: var(--grey);
-  /* Text on cream panels */
-  --text-on-panel: #262626;
-  --text-on-panel-dim: var(--grey-dark);
-  --accent: var(--blue);
-  --ok: #14c814;
-  --bad: #ee0004;
+  --bg: var(--plum);
+  --text: var(--ink);
+  --text-dim: var(--ink-soft);
+  --text-on-panel: var(--ink);
+  --text-on-panel-dim: var(--ink-soft);
+  --border: var(--tan-dark);
+  --accent: var(--cover);
+  --ok: #5fae4f;
+  --bad: #d0434d;
 
-  --c-rf: #ee3b2b;
-  --c-adc: #14a314;
-  --c-gradient: var(--blue);
-  --c-spoiler: #8a4fd8;
-  --c-delay: var(--grey-dark);
-  --c-loop: var(--orange);
+  --c-rf: #d9534f;
+  --c-adc: #4f9a4a;
+  --c-gradient: #4a78b5;
+  --c-spoiler: #8a5fb0;
+  --c-delay: var(--ink-soft);
+  --c-loop: #e08a2c;
 
   /* One sprite pixel on screen */
   --px: 2px;
   --radius: 0;
   --gap: 8px;
 
-  color-scheme: dark;
-  font-family:
-    system-ui,
-    -apple-system,
-    'Segoe UI',
-    Roboto,
-    sans-serif;
-  font-size: 15px;
+  color-scheme: light;
+  font-family: 'VT323', ui-monospace, monospace;
+  font-size: 21px;
+  line-height: 1.1;
   color: var(--text);
-  background: var(--bg);
+  /* Checkerboard like the pack's backdrop */
+  background: repeating-conic-gradient(var(--plum) 0 25%, var(--plum-light) 0 50%) 0 0 / 64px 64px;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -61,12 +74,23 @@ body,
   height: 100%;
 }
 
-/* Cream button: 32×32 sprite, slices 9/5/9/5. The pressed sprite has a lower
+h1,
+h2,
+h3,
+.title-font {
+  font-family: 'Silkscreen', 'VT323', monospace;
+  font-weight: 400;
+}
+
+a {
+  color: var(--cover-dark);
+}
+
+/* Paper button: 32×32 sprite, slices 9/5/9/5. The pressed sprite has a lower
    top edge and a thinner shade, so the label moves down by 3 sprite pixels. */
 button {
   font: inherit;
-  font-weight: 600;
-  color: var(--text-on-panel);
+  color: var(--ink);
   background: none;
   border-style: solid;
   border-width: 0;
@@ -88,25 +112,23 @@ button:active:not(:disabled) {
 }
 
 button:disabled {
-  opacity: 0.5;
+  opacity: 0.45;
   cursor: default;
 }
 
-/* Blue frame: 96×64 sprite with a 4 px bevel. */
-button.primary,
-button.selected {
-  color: var(--cream);
-  border-image: url('../assets/ui/frame-blue.png') 4 fill / calc(4 * var(--px));
+/* Book-cover frame: 96×64 sprite with a 4 px bevel. */
+button.primary {
+  color: var(--paper);
+  border-image: url('../assets/ui/frame-red.png') 4 fill / calc(4 * var(--px));
   padding: calc(5 * var(--px)) calc(6 * var(--px));
-  text-shadow: var(--px) var(--px) 0 #1b4ab9;
+  text-shadow: var(--px) var(--px) 0 var(--cover-dark);
 }
 
-button.primary:active:not(:disabled),
-button.selected:active:not(:disabled) {
-  border-image-source: url('../assets/ui/frame-blue.png');
+button.primary:active:not(:disabled) {
+  border-image-source: url('../assets/ui/frame-red.png');
   padding: calc(5 * var(--px)) calc(6 * var(--px));
   transform: translateY(var(--px));
-  filter: brightness(0.9);
+  filter: brightness(0.92);
 }
 
 button.danger {
@@ -114,14 +136,13 @@ button.danger {
 }
 
 /* Borderless button, e.g. icons in headers. */
-button.plain {
+button.plain,
+button.plain:active:not(:disabled) {
   border-image: none;
   padding: 4px;
 }
 
 button.plain:active:not(:disabled) {
-  border-image: none;
-  padding: 4px;
   transform: translateY(var(--px));
 }
 
@@ -131,7 +152,7 @@ input {
 }
 
 input[type='range'] {
-  accent-color: var(--orange);
+  accent-color: var(--cover);
 }
 
 /* Pixel icons from Icons Essential (16×16), only at whole-number scales. */
@@ -140,4 +161,15 @@ input[type='range'] {
   height: calc(16 * var(--px));
   image-rendering: pixelated;
   flex: none;
+}
+
+/* Tan heading bar, like the pack's "Main Quests" header. */
+.section-bar {
+  margin: 0;
+  padding: 4px 8px;
+  font-size: 16px;
+  text-align: center;
+  color: var(--ink);
+  background: var(--tan);
+  box-shadow: 0 var(--px) 0 var(--tan-dark);
 }

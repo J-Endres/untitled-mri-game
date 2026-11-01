@@ -2,25 +2,26 @@
   position: fixed;
   inset: 0;
   z-index: 100;
-  background: rgb(0 0 0 / 0.5);
+  background: rgb(63 40 50 / 0.55);
   display: flex;
   align-items: flex-end;
   justify-content: center;
 }
 
-/* Cream paper sprite (64×32): 1 px outline, 3 px shade at the bottom. */
+/* Paper inside the book-cover frame (bottom edge off screen). */
 .sheet {
   width: 100%;
   max-width: 560px;
   max-height: 85vh;
   overflow-y: auto;
   color: var(--text-on-panel);
+  background: var(--paper) padding-box;
   border-style: solid;
-  border-width: 0;
-  border-image: url('../../assets/ui/input.png') 2 2 5 2 fill / calc(2 * var(--px))
-    calc(2 * var(--px)) calc(5 * var(--px));
+  border-width: calc(4 * var(--px)) calc(4 * var(--px)) 0;
+  border-image: url('../../assets/ui/frame-red.png') 4 4 0 / calc(4 * var(--px)) calc(4 * var(--px))
+    0;
   image-rendering: pixelated;
-  padding: 12px 16px calc(16px + 5 * var(--px) + env(safe-area-inset-bottom));
+  padding: 12px 16px calc(16px + env(safe-area-inset-bottom));
   animation: slide-up 0.18s ease-out;
 }
 
@@ -39,11 +40,20 @@
 
 .header h2 {
   margin: 0;
-  font-size: 18px;
+  font-size: 17px;
+}
+
+.sheet h3 {
+  margin: 18px 0 6px;
+  font-size: 14px;
+}
+
+.sheet p {
+  margin: 10px 0;
 }
 
 .header button {
-  font-size: 18px;
+  font-size: 22px;
 }
 
 .field {
@@ -56,7 +66,7 @@
 .fieldLabel {
   display: flex;
   justify-content: space-between;
-  font-size: 13px;
+  font-size: 18px;
   color: var(--text-on-panel-dim);
 }
 
@@ -71,7 +81,7 @@
 
 .text {
   color: var(--text-on-panel);
-  background: var(--cream);
+  background: var(--page);
   border: var(--px) solid var(--ink);
   padding: 8px;
 }
@@ -87,13 +97,12 @@
   padding-right: 4px;
 }
 
-/* Blue frame sprite, as for primary buttons. */
+/* Tan frame sprite, like the selected row in the pack's journal. */
 .segmented button.selected,
 .segmented button.selected:active {
-  color: var(--cream);
-  border-image: url('../../assets/ui/frame-blue.png') 4 fill / calc(4 * var(--px));
+  border-image: url('../../assets/ui/frame-tan.png') 4 fill / calc(4 * var(--px));
   padding: calc(5 * var(--px)) 4px;
-  text-shadow: var(--px) var(--px) 0 #1b4ab9;
+  transform: none;
 }
 
 .actions {
@@ -124,7 +133,7 @@
 .table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: 18px;
   margin-top: 10px;
 }
 
@@ -132,12 +141,11 @@
 .table td {
   padding: 6px 4px;
   text-align: left;
-  border-bottom: var(--px) solid var(--cream-shade);
+  border-bottom: var(--px) solid var(--tan);
 }
 
 .table th {
   color: var(--text-on-panel-dim);
-  font-weight: normal;
 }
 
 .result {
@@ -145,12 +153,12 @@
 }
 
 .big {
-  font-size: 24px;
+  font-size: 30px;
 }
 
 .credits {
   margin-top: 24px;
-  font-size: 11px;
+  font-size: 16px;
   color: var(--text-on-panel-dim);
 }
 

@@ -1,4 +1,4 @@
-/* Grey bevelled frame sprite (96×64, 4 px bevel) around the image. */
+/* Tan bevelled frame sprite (96×64, 4 px bevel) around the image. */
 .view {
   position: relative;
   aspect-ratio: 1;
@@ -8,7 +8,7 @@
   background: #000;
   border-style: solid;
   border-width: calc(4 * var(--px));
-  border-image: url('../assets/ui/frame-grey.png') 4 / calc(4 * var(--px));
+  border-image: url('../assets/ui/frame-tan.png') 4 / calc(4 * var(--px));
   image-rendering: pixelated;
   overflow: hidden;
   display: grid;
@@ -27,7 +27,7 @@
 }
 
 .hint {
-  color: var(--text-dim);
+  color: var(--tan);
   text-align: center;
   padding: 24px;
 }
@@ -37,10 +37,9 @@
   top: 6px;
   right: 6px;
   padding: 2px 8px;
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 17px;
   color: var(--text-on-panel);
-  background: var(--cream);
+  background: var(--paper);
   border: var(--px) solid var(--ink);
 }
 
@@ -49,8 +48,8 @@
   inset: auto 6px 6px;
   margin: 0;
   padding: 8px;
-  font-size: 13px;
-  color: var(--cream);
-  background: #8a0003;
+  font-size: 18px;
+  color: var(--paper);
+  background: var(--cover-dark);
   border: var(--px) solid var(--ink);
 }

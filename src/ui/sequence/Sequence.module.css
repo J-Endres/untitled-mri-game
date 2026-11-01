@@ -11,28 +11,27 @@
   gap: 4px;
 }
 
-/* Simultaneous events: blue bevelled frame without fill. */
+/* Simultaneous events: orange bevelled frame without fill. */
 .linked .events {
   border-style: solid;
   border-width: calc(4 * var(--px));
-  border-image: url('../../assets/ui/frame-blue.png') 4 / calc(4 * var(--px));
+  border-image: url('../../assets/ui/frame-orange.png') 4 / calc(4 * var(--px));
   image-rendering: pixelated;
   padding: 2px;
 }
 
 .together {
-  font-size: 10px;
-  font-weight: 700;
+  font-size: 14px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #4fb8ff;
+  color: #b8650f;
   padding: 0 4px;
 }
 
 button.handle {
   flex: none;
   width: 28px;
-  font-size: 18px;
+  font-size: 22px;
   padding: 0;
   border-image: none;
   color: var(--text-dim);
@@ -61,8 +60,9 @@ button.event {
   place-items: center;
   width: 28px;
   height: 28px;
+  font-family: system-ui, sans-serif;
   font-size: 16px;
-  color: var(--cream);
+  color: var(--paper);
   background: var(--kind);
   border: var(--px) solid var(--ink);
   box-shadow: inset 0 calc(-1 * var(--px)) 0 rgb(0 0 0 / 0.25);
@@ -75,19 +75,18 @@ button.event {
 }
 
 .title {
-  font-weight: 700;
+  font-size: 23px;
 }
 
 .detail {
-  font-size: 12px;
-  font-weight: 400;
+  font-size: 17px;
   color: var(--text-on-panel-dim);
 }
 
 button.link,
 button.add {
   border-image: none;
-  border: var(--px) dashed var(--grey-dark);
+  border: var(--px) dashed var(--ink-soft);
   color: var(--text-dim);
   background: none;
 }
@@ -100,7 +99,7 @@ button.add:active:not(:disabled) {
 button.link {
   align-self: center;
   padding: 0 8px;
-  font-size: 12px;
+  font-size: 17px;
   line-height: 18px;
   border-radius: 999px;
   opacity: 0.8;
@@ -113,15 +112,15 @@ button.link:disabled {
 button.add {
   align-self: flex-start;
   margin-left: 32px;
-  font-size: 13px;
+  font-size: 18px;
   padding: 4px 10px;
 }
 
-/* Loop: orange bevelled frame without fill. */
+/* Loop: book-cover frame without fill. */
 .loop {
   border-style: solid;
   border-width: calc(4 * var(--px));
-  border-image: url('../../assets/ui/frame-orange.png') 4 / calc(4 * var(--px));
+  border-image: url('../../assets/ui/frame-red.png') 4 / calc(4 * var(--px));
   image-rendering: pixelated;
   padding: 0 4px 6px 0;
 }
@@ -148,9 +147,14 @@ button.loopTitle:active:not(:disabled) {
   padding: 6px 4px;
 }
 
+.loopTitle strong {
+  font-family: 'Silkscreen', monospace;
+  font-size: 15px;
+  font-weight: 400;
+}
+
 .count {
   color: var(--c-loop);
-  font-weight: 700;
 }
 
 .loopTitle .detail {
