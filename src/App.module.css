@@ -1,0 +1,47 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: env(safe-area-inset-top) 0 0;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 12px;
+}
+
+.header button {
+  background: none;
+  border: none;
+  font-weight: 600;
+}
+
+.top {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  padding: 0 12px 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.editor {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 12px 12px 4px;
+}
+
+.footer {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: var(--gap);
+  padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.footer button {
+  padding: 12px;
+}
