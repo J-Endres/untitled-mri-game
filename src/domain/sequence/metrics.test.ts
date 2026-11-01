@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { createBlock, createEvent, createLoop, createStarterSequence } from './factory'
-import { adcCount, estimateSar, sequenceDurationUs } from './metrics'
+import { adcCount, adcSampleDwellsUs, estimateSar, sequenceDurationUs } from './metrics'
 import type { AdcEvent, GradientEvent } from './types'
 
 describe('sequence metrics', () => {
@@ -10,6 +10,7 @@ describe('sequence metrics', () => {
     const seq = { nodes: [createLoop(3, [createBlock(adc, gx)])] }
     expect(sequenceDurationUs(seq)).toBe(4500)
     expect(adcCount(seq.nodes)).toBe(3)
+    expect(adcSampleDwellsUs(seq.nodes)).toEqual(Array(300).fill(10))
   })
 
   it('gives the starter sequence a plausible SAR', () => {

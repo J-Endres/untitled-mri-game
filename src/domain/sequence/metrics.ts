@@ -63,3 +63,20 @@ export function estimateSar(seq: Sequence): number {
   const duration = sequenceDurationUs(seq) * 1e-6
   return duration > 0 ? (SAR_SCALE * rfEnergy(seq.nodes)) / duration : 0
 }
+
+/** Dwell time of every ADC sample in sequence order (loops unrolled), in µs. */
+export function adcSampleDwellsUs(nodes: SeqNode[]): number[] {
+  const out: number[] = []
+  const walk = (list: SeqNode[]) => {
+    for (const n of list) {
+      if (n.type === 'loop') {
+        for (let i = 0; i < n.count; i++) walk(n.body)
+      } else {
+        for (const e of n.events)
+          if (e.kind === 'adc') out.push(...Array<number>(e.samples).fill(e.dwellUs))
+      }
+    }
+  }
+  walk(nodes)
+  return out
+}
