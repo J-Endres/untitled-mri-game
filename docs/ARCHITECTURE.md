@@ -20,10 +20,10 @@ the app talks to the MRX MCP gateway directly. Leaderboard and challenges are st
   - `challenge/` - challenge definitions, constraints and scoring.
   - `pulseq/` - Pulseq 1.4 writer (loop unrolling, trapezoids, RF/ADC/shape libraries).
 - **`src/services/`** - interfaces for everything that crosses the network, plus `mock*`
-  implementations. `App.tsx` decides which implementation is used: MRX if
-  `VITE_MRX_API_KEY` is set, the offline mock otherwise.
-  - `mrx/` - minimal MCP client (Streamable HTTP), `.npy` reader/writer, image/SNR helpers and
-    the simulation pipeline.
+  implementations. `mrx/config.ts` decides how MRX is reached (see
+  [Authentication](#authentication)); `App.tsx` uses the mock only with `VITE_MRX_MOCK=true`.
+  - `mrx/` - minimal MCP client (Streamable HTTP), OAuth login, `.npy` reader/writer,
+    image/SNR helpers and the simulation pipeline.
 - **`src/state/`** - `sequenceReducer` (UI actions -> domain operations) and `useSimulation`
   (async scan state, discards stale results).
 - **`src/ui/`** - React components. `sequence/` is the drag-and-drop editor, `sheets/` holds
@@ -65,7 +65,7 @@ One scan (`src/services/mrx/mrxSimulation.ts`):
 3. In parallel: `trajex_extract_trajectory` (k-space per ADC sample) and `rapisim_simulate` on
    the challenge's phantom (`bifti_get_phantom`, resliced; `sampler: "fft"`).
 4. Noise is added in the browser (the simulation is noise-free) and the noisy signal is uploaded
-   with `create_upload_url`.
+   with `create_upload_url` (as `POST`: the gateway's CORS does not allow `PUT`).
 5. `reco_reconstruct` with `method: "nufft"`. FOV is fixed at 200 mm; the matrix is the smallest
    one whose Nyquist limit covers the sampled k-space (the tool rejects anything else).
 6. The magnitude image is normalised and shown; SNR is measured on it.
@@ -82,25 +82,35 @@ Metrics:
   Artefacts in the background therefore lower the SNR too. `NOISE_REL` is a first estimate and
   needs calibrating against real runs.
 
-Known limitations of running in the browser (to be fixed together with OAuth / a backend):
-the API key and the phantom choice are visible to the player, every scan leaves files in the
-user's MRX storage, and it relies on the gateway allowing cross-origin requests.
+Known limitations of running in the browser (a backend could fix them): the phantom choice is
+visible to the player and every scan leaves files in the player's MRX storage.
 
-### Not yet verified against the real gateway
+### Authentication
 
-The browser client was only tested against a fake server in Playwright (the development
-container had no network access to MRX). The Pulseq export itself _was_ verified with the MRX
-tools (trajex + rapisim + nufft reco give a recognisable head). Still to check with a real
-`npm run dev` scan:
+Every MRX request carries `Authorization: Bearer <token>` (`mrx/authFetch.ts`, which also
+retries once after a 401). The token comes from one of:
 
-- [ ] Endpoint is `https://mrx-org--mcp-gateway-func.modal.run/mcp` (override: `VITE_MRX_URL`)
-- [ ] The API key is accepted as `Authorization: Bearer <key>`
-- [ ] CORS allows the MCP calls, `GET /files/<hash>` downloads (with the auth header) and the
-      `PUT` to the `create_upload_url` URL; the upload response body is the sha256
-- [ ] Result shapes match what `mrxSimulation.ts` expects (`upload_file` -> `result` hash,
-      trajex `structuredContent.kspace.sha256`, resource links named `signal.npy`, `*.zip`,
-      `*-kspace.npy`, `*.npy`)
-- [ ] Calibrate `NOISE_REL` so the starter sequence lands near SNR 10
+- **OAuth (default, all deployed builds)** - `mrx/oauth.ts` implements the MCP authorization
+  flow: protected-resource metadata -> authorization-server metadata -> dynamic client
+  registration (public client, once per redirect URI) -> authorization code with PKCE ->
+  access + refresh token. The redirect URI is the app's own URL, so it works on localhost and
+  on GitHub Pages alike. Tokens and client id live in `localStorage`; the sequence is kept in
+  `sessionStorage` across the login redirect.
+- **`VITE_MRX_API_KEY`** - local testing only, compiled into the bundle. CI fails if a key
+  ends up in `dist/`.
+
+### Verified against the real gateway (2026-11)
+
+- [x] Endpoint `https://mrx-org--mcp-gateway-func.modal.run/mcp`, API key as bearer token
+- [x] CORS allows the MCP calls, file downloads, OAuth discovery/registration/token, and
+      `POST` (not `PUT`) to upload URLs; the upload response body is the sha256
+- [x] SSE responses use CRLF line endings (now handled)
+- [x] Full scan of the starter sequence in Chromium: upload, trajex, rapisim, reco, downloads
+- [x] OAuth up to the MRX consent page (registration + PKCE redirect, sub-path redirect URI)
+- [ ] OAuth after consent (code exchange, refresh) - only unit-tested against a fake server
+- [ ] The starter sequence's image shows vertical stripes instead of the phantom - check
+      reco output orientation/shape (`magnitudeImage`) and the phase-encode gradients
+- [ ] Calibrate `NOISE_REL` (starter sequence currently gives SNR ≈ 3.5, target ≈ 10)
 
 ## Testing
 
@@ -117,9 +127,13 @@ Short log of choices that are not obvious from the code. Add an entry when you m
   (`@dnd-kit`). Canvas is enough for the image; no game engine needed for a list-based UI.
 - **2026-11 - Model = Pulseq blocks + loops.** Keeps export trivial and makes "linking" a
   direct operation on blocks.
-- **2026-11 - MRX called from the browser for now.** Fastest way to a playable prototype. Uses a
-  test API key that must be removed before release; later OAuth (which also identifies users for
-  leaderboard submissions). A backend may still be needed to hide the phantom from players.
+- **2026-11 - MRX called from the browser for now.** Fastest way to a playable prototype.
+  Players log in with MRX via OAuth (which also identifies users for leaderboard submissions);
+  an API key is only for local testing. A backend may still be needed to hide the phantom.
+- **2026-11 - Dynamic client registration instead of a client id metadata document.** Works on
+  any origin (localhost, Pages, future environments) without hosting extra files.
+- **2026-11 - GitHub Pages via Actions.** `ci.yml` builds every push/PR and deploys `main`.
+  More environments (e.g. previews per branch) can come later.
 - **2026-11 - Own minimal MCP client instead of the SDK.** We only need `initialize` and
   `tools/call`; ~100 lines instead of a large dependency.
 - **2026-11 - No state library, no router.** One screen; `useReducer` + context suffice.

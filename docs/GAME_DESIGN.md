@@ -64,8 +64,7 @@ else 0. Ideas: bonus for fewer blocks, for SAR headroom, for higher resolution.
 
 1. ~~Repo setup, UI mockup with mock services~~
 2. ~~Pulseq export with tests~~
-3. ~~MRX pipeline from the browser (export -> trajex -> rapisim -> nufft reco), SNR~~ (this
-   state, with a temporary API key)
-4. OAuth login with MRX (user id for submissions), remove the test key
+3. ~~MRX pipeline from the browser (export -> trajex -> rapisim -> nufft reco), SNR~~
+4. ~~OAuth login with MRX, publish on GitHub Pages~~ (user id for submissions still open)
 5. Challenges and answer checking that the player cannot inspect, real leaderboard
 6. Polish: hardware limits, onboarding/tutorial challenge, sequence templates, undo, PWA install
