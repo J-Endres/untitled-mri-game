@@ -23,11 +23,12 @@ export class McpClient {
   private initialized?: Promise<void>
   private nextId = 1
   private readonly url: string
-  private readonly headers: Record<string, string>
+  private readonly fetch: typeof fetch
 
-  constructor(url: string, headers: Record<string, string>) {
+  /** `fetchFn` adds authentication, see `authorizedFetch`. */
+  constructor(url: string, fetchFn: typeof fetch) {
     this.url = url
-    this.headers = headers
+    this.fetch = fetchFn
   }
 
   async callTool(name: string, args: Record<string, unknown>): Promise<ToolResult> {
@@ -63,14 +64,13 @@ export class McpClient {
   }
 
   private async post(body: unknown): Promise<Response> {
-    const response = await fetch(this.url, {
+    const response = await this.fetch(this.url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json, text/event-stream',
         'MCP-Protocol-Version': PROTOCOL_VERSION,
         ...(this.sessionId ? { 'Mcp-Session-Id': this.sessionId } : {}),
-        ...this.headers,
       },
       body: JSON.stringify(body),
     })
@@ -96,7 +96,9 @@ async function readResponse(response: Response, id: number): Promise<JsonRpcMess
   for (;;) {
     const { value, done } = await reader.read()
     if (done) throw new Error('MCP stream ended without a response')
-    buffer += value
+    // SSE allows CRLF line endings (the MRX gateway uses them). Normalising the
+    // whole buffer keeps a CRLF that is split across chunks intact.
+    buffer = (buffer + value).replace(/\r\n/g, '\n')
     let end
     while ((end = buffer.indexOf('\n\n')) >= 0) {
       const event = buffer.slice(0, end)

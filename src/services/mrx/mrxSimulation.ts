@@ -10,7 +10,7 @@
  * signal scale of the simulator.
  *
  * Runs in the browser for now; the phantom choice therefore is not secret.
- * Moves to a backend together with the switch to OAuth (see config.ts).
+ * May move to a backend later to hide it.
  */
 import {
   adcCount,
@@ -23,7 +23,6 @@ import {
 } from '../../domain/sequence'
 import { writePulseq } from '../../domain/pulseq'
 import type { SimulationService } from '../simulation'
-import { mrxConfig } from './config'
 import { addComplexNoise, estimateSnr, magnitudeImage } from './image'
 import { McpClient, type ToolResult } from './mcpClient'
 import { parseNpy, writeComplex64Npy } from './npy'
@@ -45,17 +44,18 @@ const MAX_MATRIX = 256
 const NOISE_REL = 1e-4
 const NOISE_REF_DWELL_US = 20
 
-export function createMrxSimulationService(): SimulationService {
-  const auth: Record<string, string> = mrxConfig.apiKey
-    ? { Authorization: `Bearer ${mrxConfig.apiKey}` }
-    : {}
-  const client = new McpClient(mrxConfig.url, auth)
+/** `authFetch` authenticates against MRX (see config.ts). */
+export function createMrxSimulationService(
+  mcpUrl: string,
+  authFetch: typeof fetch,
+): SimulationService {
+  const client = new McpClient(mcpUrl, authFetch)
   const phantomCache = new Map<string, Promise<{ hash: string; m0: number }>>()
 
   const call = (name: string, args: Record<string, unknown>) => client.callTool(name, args)
 
   async function download(url: string) {
-    const response = await fetch(url, { headers: auth })
+    const response = await authFetch(url)
     if (!response.ok) throw new Error(`Download failed (${response.status}): ${url}`)
     return parseNpy(await response.arrayBuffer())
   }
@@ -69,7 +69,9 @@ export function createMrxSimulationService(): SimulationService {
     const { url } = structured(await call('create_upload_url', { file_name: fileName })) as {
       url: string
     }
-    const response = await fetch(url, { method: 'PUT', body })
+    // Pre-signed URL: must not carry the MRX token. POST rather than PUT (as in
+    // `curl -T`) because the gateway's CORS only allows GET/POST/DELETE.
+    const response = await fetch(url, { method: 'POST', body })
     if (!response.ok) throw new Error(`Upload failed (${response.status})`)
     return (await response.text()).trim()
   }
