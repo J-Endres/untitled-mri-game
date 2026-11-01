@@ -1,0 +1,64 @@
+.plot {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: var(--paper);
+}
+
+.plot canvas {
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
+.dim {
+  opacity: 0.45;
+}
+
+.hint {
+  margin: 0;
+  padding: 24px;
+  text-align: center;
+  color: var(--ink-soft);
+}
+
+.legend,
+.axis {
+  position: absolute;
+  top: 4px;
+  font-size: 15px;
+  color: var(--ink-soft);
+}
+
+.legend {
+  left: 6px;
+}
+
+.axis,
+.axis:active:not(:disabled) {
+  right: 2px;
+  top: 0;
+  padding: 2px 4px;
+  font-size: 15px;
+  color: var(--cover-dark);
+  text-decoration: underline dotted;
+}
+
+.line,
+.dot {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.line {
+  width: 12px;
+  height: 2px;
+  background: var(--ink-soft);
+}
+
+.dot {
+  width: 4px;
+  height: 4px;
+  margin-left: 6px;
+  background: var(--cover);
+}

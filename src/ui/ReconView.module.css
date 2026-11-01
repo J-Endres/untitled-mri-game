@@ -1,16 +1,9 @@
-/* Tan bevelled frame sprite (96×64, 4 px bevel) around the image. */
+/* Fills the framed panel box (App.module.css). */
 .view {
   position: relative;
-  aspect-ratio: 1;
-  /* Leave at least half the screen for the sequence editor. */
-  width: min(100%, 34dvh);
-  margin: 0 auto;
+  width: 100%;
+  height: 100%;
   background: #000;
-  border-style: solid;
-  border-width: calc(4 * var(--px));
-  border-image: url('../assets/ui/frame-tan.png') 4 / calc(4 * var(--px));
-  image-rendering: pixelated;
-  overflow: hidden;
   display: grid;
   place-items: center;
 }

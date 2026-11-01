@@ -1,4 +1,4 @@
-import { useMemo, useReducer, useState } from 'react'
+import { useMemo, useReducer, useState, useSyncExternalStore } from 'react'
 import { challenges } from './domain/challenge'
 import {
   createStarterSequence,
@@ -7,6 +7,7 @@ import {
   type ContainerId,
   type Sequence,
 } from './domain/sequence'
+import { activityLog, errorMessage } from './services/activityLog'
 import { mockLeaderboardService } from './services/leaderboard'
 import { mockSimulationService } from './services/mockSimulation'
 import { mrx } from './services/mrx/config'
@@ -16,6 +17,8 @@ import { useSimulation } from './state/useSimulation'
 import styles from './App.module.css'
 import { MetricsBar } from './ui/MetricsBar'
 import { Icon } from './ui/icons'
+import { KSpaceView } from './ui/KSpaceView'
+import { LogView } from './ui/LogView'
 import { ReconView } from './ui/ReconView'
 import { EditorContext, type EditorContextValue } from './ui/sequence/EditorContext'
 import { SequenceEditor } from './ui/sequence/SequenceEditor'
@@ -39,6 +42,14 @@ function initialSequence(): Sequence {
   return saved ? (JSON.parse(saved) as Sequence) : createStarterSequence()
 }
 
+const TABS = [
+  { id: 'reco', label: 'Reco' },
+  { id: 'stats', label: 'Stats' },
+  { id: 'kspace', label: 'K-space' },
+  { id: 'logs', label: 'Logs' },
+] as const
+type Tab = (typeof TABS)[number]['id']
+
 type Sheet =
   | { kind: 'event'; id: string }
   | { kind: 'loop'; id: string }
@@ -51,6 +62,17 @@ export default function App() {
   const [sheet, setSheet] = useState<Sheet | null>(null)
   const { state: sim, run } = useSimulation(simulationService, challenge.id)
   const close = () => setSheet(null)
+  const [tab, setTab] = useState<Tab>('reco')
+
+  // Mark the Logs tab while it holds errors the player has not looked at.
+  const log = useSyncExternalStore(activityLog.subscribe, activityLog.entries)
+  const [logSeenId, setLogSeenId] = useState(0)
+  const lastLogId = log.at(-1)?.id ?? 0
+  const unseenError = tab !== 'logs' && log.some((e) => e.level === 'error' && e.id > logSeenId)
+  const openTab = (next: Tab) => {
+    if (tab === 'logs' || next === 'logs') setLogSeenId(lastLogId)
+    setTab(next)
+  }
 
   // Re-evaluated on every render; a rejected login shows up as a scan error.
   const loggedIn = mrx.mode !== 'oauth' || mrx.auth.isLoggedIn()
@@ -64,7 +86,8 @@ export default function App() {
     } catch (e) {
       sessionStorage.removeItem(SAVED_SEQUENCE)
       setLoggingIn(false)
-      window.alert(e instanceof Error ? e.message : String(e))
+      activityLog.error(`Login: ${errorMessage(e)}`)
+      window.alert(errorMessage(e))
     }
   }
   const logout = () => {
@@ -116,49 +139,80 @@ export default function App() {
           </div>
         </header>
 
-        <section className={styles.top}>
-          <ReconView state={sim} outdated={outdated} />
-          <MetricsBar constraints={challenge.constraints} metrics={metrics} />
+        <nav className={styles.tabs} role="tablist">
+          {TABS.map((t) => (
+            <button
+              key={t.id}
+              role="tab"
+              aria-selected={tab === t.id}
+              className={tab === t.id ? styles.activeTab : undefined}
+              onClick={() => openTab(t.id)}
+            >
+              {t.label}
+              {t.id === 'logs' && unseenError && (
+                <i className={styles.alert} aria-label="new errors" />
+              )}
+            </button>
+          ))}
+        </nav>
+
+        <section className={styles.top} role="tabpanel">
+          <div className={styles.box}>
+            {tab === 'reco' && <ReconView state={sim} outdated={outdated} />}
+            {tab === 'stats' && (
+              <MetricsBar constraints={challenge.constraints} metrics={metrics} column />
+            )}
+            {tab === 'kspace' && (
+              <KSpaceView
+                trajectory={
+                  sim.status === 'done'
+                    ? sim.result.trajectory
+                    : sim.status === 'running'
+                      ? sim.previous?.trajectory
+                      : undefined
+                }
+                outdated={outdated}
+              />
+            )}
+            {tab === 'logs' && <LogView />}
+          </div>
+
+          <button
+            className={styles.guess}
+            disabled={sim.status !== 'done' || outdated}
+            onClick={() => setSheet({ kind: 'guess' })}
+            aria-label="Guess"
+            title="Guess what is in the scanner"
+          >
+            <Icon name="search" />
+          </button>
+          {loggedIn ? (
+            <button
+              className={`primary ${styles.scan}`}
+              disabled={sim.status === 'running'}
+              onClick={() => run(sequence)}
+              aria-label={sim.status === 'running' ? sim.step : 'Scan'}
+              title="Scan"
+            >
+              <Icon name="play" />
+            </button>
+          ) : (
+            <button
+              className={`primary ${styles.scan}`}
+              disabled={loggingIn}
+              onClick={login}
+              aria-label="Log in with MRX to scan"
+              title="Log in with MRX to scan"
+            >
+              <Icon name="enter" />
+            </button>
+          )}
         </section>
 
         <main className={styles.editor}>
           <h2 className="section-bar">Sequence</h2>
           <SequenceEditor />
         </main>
-
-        <footer className={styles.footer}>
-          <button
-            disabled={sim.status !== 'done' || outdated}
-            onClick={() => setSheet({ kind: 'guess' })}
-          >
-            <Icon name="search" /> Guess
-          </button>
-          {loggedIn ? (
-            <button
-              className="primary"
-              disabled={sim.status === 'running'}
-              onClick={() => run(sequence)}
-            >
-              {sim.status === 'running' ? (
-                sim.step
-              ) : (
-                <>
-                  <Icon name="play" /> Scan
-                </>
-              )}
-            </button>
-          ) : (
-            <button className="primary" disabled={loggingIn} onClick={login}>
-              {loggingIn ? (
-                'Opening MRX login…'
-              ) : (
-                <>
-                  <Icon name="enter" /> Log in with MRX to scan
-                </>
-              )}
-            </button>
-          )}
-        </footer>
 
         {sheet?.kind === 'event' && <EventSheet eventId={sheet.id} onClose={close} />}
         {sheet?.kind === 'loop' && <LoopSheet loopId={sheet.id} onClose={close} />}
