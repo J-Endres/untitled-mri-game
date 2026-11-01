@@ -19,7 +19,7 @@ export function BottomSheet({ title, onClose, children }: Props) {
       >
         <header className={styles.header}>
           <h2>{title}</h2>
-          <button onClick={onClose} aria-label="Close">
+          <button className="plain" onClick={onClose} aria-label="Close">
             ✕
           </button>
         </header>

@@ -18,7 +18,6 @@ export function AddSheet({ onAdd, onClose }: Props) {
         {KINDS.map((kind) => (
           <button
             key={kind}
-            style={{ borderColor: kindInfo[kind].color }}
             onClick={() => {
               onAdd(kind)
               onClose()

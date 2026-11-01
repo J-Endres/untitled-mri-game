@@ -11,27 +11,29 @@
   gap: 4px;
 }
 
+/* Simultaneous events: orange bevelled frame without fill. */
 .linked .events {
-  border: 1px dashed var(--accent);
-  border-radius: var(--radius);
-  padding: 4px;
+  border-style: solid;
+  border-width: calc(4 * var(--px));
+  border-image: url('../../assets/ui/frame-orange.png') 4 / calc(4 * var(--px));
+  image-rendering: pixelated;
+  padding: 2px;
 }
 
 .together {
-  font-size: 10px;
+  font-size: 14px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--accent);
+  color: #b8650f;
   padding: 0 4px;
 }
 
-.handle {
+button.handle {
   flex: none;
   width: 28px;
-  font-size: 18px;
+  font-size: 22px;
   padding: 0;
-  border: none;
-  background: none;
+  border-image: none;
   color: var(--text-dim);
   touch-action: none;
   cursor: grab;
@@ -45,20 +47,25 @@
   min-width: 0;
 }
 
-.event {
-  display: flex;
-  align-items: center;
+button.event {
+  justify-content: flex-start;
   gap: 10px;
   text-align: left;
-  background: var(--surface);
-  border-left-width: 4px;
-  padding: 8px 10px;
 }
 
+/* Event kind badge: pixel square in the kind's colour. */
 .icon {
-  font-size: 18px;
-  width: 20px;
-  text-align: center;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  font-family: system-ui, sans-serif;
+  font-size: 16px;
+  color: var(--paper);
+  background: var(--kind);
+  border: var(--px) solid var(--ink);
+  box-shadow: inset 0 calc(-1 * var(--px)) 0 rgb(0 0 0 / 0.25);
 }
 
 .text {
@@ -68,44 +75,54 @@
 }
 
 .title {
-  font-weight: 600;
+  font-size: 23px;
 }
 
 .detail {
-  font-size: 12px;
-  color: var(--text-dim);
+  font-size: 17px;
+  color: var(--text-on-panel-dim);
 }
 
-.link {
+button.link,
+button.add {
+  border-image: none;
+  border: var(--px) dashed var(--ink-soft);
+  color: var(--text-dim);
+  background: none;
+}
+
+button.link:active:not(:disabled),
+button.add:active:not(:disabled) {
+  border-image: none;
+}
+
+button.link {
   align-self: center;
   padding: 0 8px;
-  font-size: 12px;
+  font-size: 17px;
   line-height: 18px;
   border-radius: 999px;
-  background: none;
-  border-style: dashed;
-  opacity: 0.7;
+  opacity: 0.8;
 }
 
-.link:disabled {
+button.link:disabled {
   opacity: 0.15;
 }
 
-.add {
+button.add {
   align-self: flex-start;
   margin-left: 32px;
-  font-size: 13px;
+  font-size: 18px;
   padding: 4px 10px;
-  background: none;
-  border-style: dashed;
-  color: var(--text-dim);
 }
 
+/* Loop: book-cover frame without fill. */
 .loop {
-  border: 1px solid color-mix(in srgb, var(--c-loop) 40%, transparent);
-  border-radius: var(--radius);
-  background: color-mix(in srgb, var(--c-loop) 5%, transparent);
-  padding: 4px 4px 8px 0;
+  border-style: solid;
+  border-width: calc(4 * var(--px));
+  border-image: url('../../assets/ui/frame-red.png') 4 / calc(4 * var(--px));
+  image-rendering: pixelated;
+  padding: 0 4px 6px 0;
 }
 
 .loopHeader {
@@ -113,28 +130,40 @@
   gap: 4px;
 }
 
-.loopTitle {
+button.loopTitle {
   flex: 1;
   display: flex;
   align-items: baseline;
+  justify-content: flex-start;
   gap: 8px;
   text-align: left;
-  background: none;
-  border: none;
+  color: var(--text);
+  border-image: none;
   padding: 6px 4px;
+}
+
+button.loopTitle:active:not(:disabled) {
+  border-image: none;
+  padding: 6px 4px;
+}
+
+.loopTitle strong {
+  font-family: 'Silkscreen', monospace;
+  font-size: 15px;
+  font-weight: 400;
 }
 
 .count {
   color: var(--c-loop);
-  font-weight: 600;
 }
 
 .loopTitle .detail {
   margin-left: auto;
+  color: var(--text-dim);
 }
 
 .loopBody {
   padding-left: 16px;
-  border-left: 2px solid color-mix(in srgb, var(--c-loop) 60%, transparent);
+  border-left: var(--px) dashed color-mix(in srgb, var(--c-loop) 60%, transparent);
   margin-left: 14px;
 }
